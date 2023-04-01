@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,6 +18,7 @@
 		744970CC1E5398E90088C63C /* Array+Search.swift in Sources */ = {isa = PBXBuildFile; fileRef = 744970CB1E5398E90088C63C /* Array+Search.swift */; };
 		74BA9E3E1E53270300C78C58 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74BA9E3D1E53270300C78C58 /* main.swift */; };
 		74FFC9621E98E7AA00EAA0FA /* ProcessNameProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74FFC9611E98E7AA00EAA0FA /* ProcessNameProtocol.swift */; };
+		B6B676B329D7E53300C6575E /* Cache in Frameworks */ = {isa = PBXBuildFile; productRef = B6B676B229D7E53300C6575E /* Cache */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B6B676B329D7E53300C6575E /* Cache in Frameworks */,
 				743921811E5DEDF100720BFB /* AppKit.framework in Frameworks */,
 				74466BA51E5760FB0032382F /* ScriptingBridge.framework in Frameworks */,
 			);
@@ -128,6 +130,9 @@
 			dependencies = (
 			);
 			name = EnumWindows;
+			packageProductDependencies = (
+				B6B676B229D7E53300C6575E /* Cache */,
+			);
 			productName = EnumWindows;
 			productReference = 74BA9E3A1E53270300C78C58 /* EnumWindows */;
 			productType = "com.apple.product-type.tool";
@@ -144,7 +149,7 @@
 				TargetAttributes = {
 					74BA9E391E53270300C78C58 = {
 						CreatedOnToolsVersion = 8.2.1;
-						DevelopmentTeam = LADJFGFXHV;
+						DevelopmentTeam = 34YL893KPQ;
 						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 					};
@@ -159,6 +164,9 @@
 				en,
 			);
 			mainGroup = 74BA9E311E53270300C78C58;
+			packageReferences = (
+				B6B676AF29D7D49000C6575E /* XCRemoteSwiftPackageReference "Cache" */,
+			);
 			productRefGroup = 74BA9E3B1E53270300C78C58 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -228,7 +236,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -271,7 +279,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				SDKROOT = macosx;
 				SWIFT_INSTALL_OBJC_HEADER = NO;
 				SWIFT_OBJC_INTERFACE_HEADER_NAME = "";
@@ -282,7 +290,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
-				DEVELOPMENT_TEAM = LADJFGFXHV;
+				DEVELOPMENT_TEAM = 34YL893KPQ;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.mandrigin.EnumWindows;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
@@ -294,7 +302,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_IDENTITY = "Mac Developer";
-				DEVELOPMENT_TEAM = LADJFGFXHV;
+				DEVELOPMENT_TEAM = 34YL893KPQ;
 				PRODUCT_BUNDLE_IDENTIFIER = ru.mandrigin.EnumWindows;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_SWIFT3_OBJC_INFERENCE = On;
@@ -324,6 +332,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B6B676AF29D7D49000C6575E /* XCRemoteSwiftPackageReference "Cache" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/hyperoslo/Cache";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B6B676B229D7E53300C6575E /* Cache */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B6B676AF29D7D49000C6575E /* XCRemoteSwiftPackageReference "Cache" */;
+			productName = Cache;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 74BA9E321E53270300C78C58 /* Project object */;
 }

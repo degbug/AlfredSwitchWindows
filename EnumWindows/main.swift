@@ -1,36 +1,87 @@
 import Foundation
 
+import Cache
+
+
+func refreshBrowserCache() {
+    var results : [[AlfredItem]] = []
+    var allActiveWindows :[WindowInfoDict] = []
+    print("refresh")
+    for browserName in ["Microsoft Edge", "Microsoft Edge Beta"] {
+        allActiveWindows = searchBrowserTabsIfNeeded(processName: browserName,
+                                                     windows: allActiveWindows,
+                                                     query: "",
+                                                     refresh: true,
+                                                     results: &results) // inout!
+    }
+}
+
 /// Removes browser window from the list of windows and adds tabs to the results array
 func searchBrowserTabsIfNeeded(processName: String,
                                windows: [WindowInfoDict],
                                query: String,
+                               refresh: Bool,
                                results: inout [[AlfredItem]]) -> [WindowInfoDict] {
     
     let activeWindowsExceptBrowser = windows.filter { ($0.processName != processName) }
     
-    let browserTabs =
-        BrowserApplication.connect(processName: processName)?.windows
-            .flatMap { return $0.tabs }
-            .search(query: query)
+    
+    let diskConfig = DiskConfig(name: "alfred-items")
+    let memoryConfig = MemoryConfig(expiry: .never, countLimit: 10, totalCostLimit: 10)
+    let storage = try? Storage<String, [CodableBrowserTab]>(
+      diskConfig: diskConfig,
+      memoryConfig: memoryConfig,
+      transformer: TransformerFactory.forCodable(ofType: [CodableBrowserTab].self) // Storage<String, User>
+    )
+    
+    var browserTabs: [CodableBrowserTab]?
+    if !refresh {
+        let cached = try? storage?.object(forKey: processName + "tabs")
+        if cached != nil{
+            browserTabs = cached?!.search(query: query)
+            results.append(browserTabs ?? [])
+            return activeWindowsExceptBrowser
+        }
+    }
+    
+    
+
+    browserTabs = BrowserApplication.connect(processName: processName)?.windows
+        .flatMap { return $0.codableTabs }
+    
+    try? storage?.setObject(browserTabs!, forKey: processName + "tabs")
+
+    browserTabs = browserTabs?.search(query: query)
+    
+//    let browserTabs =
+//        BrowserApplication.connect(processName: processName)?.windows
+//        .flatMap { return $0.codableTabs }
+//            .search(query: query)
     
     results.append(browserTabs ?? [])
     
     return activeWindowsExceptBrowser
 }
 
-func search(query: String, onlyTabs: Bool) {
+func search(query: String, onlyTabs: Bool, noTabs: Bool) {
     var results : [[AlfredItem]] = []
+    var allActiveWindows :[WindowInfoDict] = []
+    if !onlyTabs {
+        allActiveWindows = Windows.all
+    }
+//    for browserName in ["Microsoft Edge","Safari", "Safari Technology Preview",
+//                        "Google Chrome", "Google Chrome Canary",
+//                        "Opera", "Opera Beta", "Opera Developer",
+//                        "Brave Browser", "iTerm"] {
     
-    var allActiveWindows : [WindowInfoDict] = Windows.all
-    
-    for browserName in ["Safari", "Safari Technology Preview",
-                        "Google Chrome", "Google Chrome Canary",
-                        "Opera", "Opera Beta", "Opera Developer",
-                        "Brave Browser", "iTerm"] {
-        allActiveWindows = searchBrowserTabsIfNeeded(processName: browserName,
-                                                     windows: allActiveWindows,
-                                                     query: query,
-                                                     results: &results) // inout!
+    if !noTabs {
+        for browserName in ["Microsoft Edge", "Microsoft Edge Beta"] {
+            allActiveWindows = searchBrowserTabsIfNeeded(processName: browserName,
+                                                         windows: allActiveWindows,
+                                                         query: query,
+                                                         refresh: false,
+                                                         results: &results) // inout!
+        }
     }
     
     if !onlyTabs {
@@ -86,13 +137,19 @@ if(CommandLine.commands().isEmpty) {
 }
 
 for command in CommandLine.commands() {
+    
     switch command {
+    case _ as RefreshCommand:
+        refreshBrowserCache()
+        exit(0)
     case let searchCommand as SearchCommand:
-        search(query: searchCommand.query, onlyTabs: false)
+        search(query: searchCommand.query, onlyTabs: false, noTabs: false)
         exit(0)
     case let searchCommand as OnlyTabsCommand:
-        search(query: searchCommand.query, onlyTabs: true)
+        search(query: searchCommand.query, onlyTabs: true, noTabs: false)
         exit(0)
+    case let searchCommand as NoTabsSearchCommand:
+        search(query: searchCommand.query, onlyTabs: false, noTabs: true)
     default:
         print("Unknown command!")
         print("Commands:")

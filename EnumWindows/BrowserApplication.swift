@@ -6,6 +6,17 @@ protocol BrowserEntity {
     var rawItem : AnyObject { get }
 }
 
+class CodableEntity: BrowserEntity {
+    private let tabRaw : AnyObject
+    var rawItem: AnyObject {
+        return self.tabRaw
+    }
+    
+    init(tabRaw: AnyObject) {
+        self.tabRaw = tabRaw
+    }
+}
+
 protocol BrowserNamedEntity : BrowserEntity {
     var title : String { get }
 }
@@ -19,15 +30,42 @@ extension BrowserEntity {
 
         let selectorResult = self.rawItem.perform(sel)
 
-        guard let retainedValue = selectorResult?.takeRetainedValue() else {
+        guard var retainedValue = selectorResult?.takeRetainedValue() else {
             return defaultValue
         }
+        
+    
+        if "URL" == name {
+            retainedValue = retainedValue.replacingOccurrences(of: "https://", with: "").replacingOccurrences(of: "http://", with: "") as AnyObject
+        }
+          
         
         guard let result = retainedValue as? T else {
             return defaultValue
         }
         
+       
+        
         return result
+    }
+}
+
+struct CodableBrowserTab : Searchable, Codable {
+    let index : Int?
+    let processName: String
+    let windowTitle: String
+    let url: String
+    let title: String
+    
+    var searchStrings : [String] {
+        return ["Browser", self.url, self.title, self.processName]
+    }
+    
+    var tabIndex : Int {
+        guard let i = index else {
+            return 0
+        }
+        return i
     }
 }
 
@@ -37,6 +75,7 @@ class BrowserTab : BrowserNamedEntity, Searchable, ProcessNameProtocol {
     
     let windowTitle : String
     let processName : String
+    
     
     init(raw: AnyObject, index: Int?, windowTitle: String, processName: String) {
         tabRaw = raw
@@ -123,6 +162,21 @@ class BrowserWindow : BrowserNamedEntity {
                 return iTermTab(raw: element, index: index + 1, windowTitle: self.title, processName: self.processName)
             }
             return BrowserTab(raw: element, index: index + 1, windowTitle: self.title, processName: self.processName)
+        }
+    }
+    
+    // let processName: String
+//    let windowTitle: String
+//    let url: String
+//    let title: String
+    
+    var codableTabs : [CodableBrowserTab] {
+        let result = performSelectorByName(name: "tabs", defaultValue: [AnyObject]())
+        return result.enumerated().map { (index, element) in
+            let e = CodableEntity(tabRaw: element)
+            let url:String = e.performSelectorByName(name: "URL", defaultValue: "")
+            let title: String =  e.performSelectorByName(name: "title", defaultValue: "")
+            return CodableBrowserTab(index: index+1, processName: self.processName, windowTitle: self.title, url: url, title: title)
         }
     }
 
